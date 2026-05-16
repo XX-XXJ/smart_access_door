@@ -21,6 +21,7 @@ idf_component_register(
         "fingerprint_as608.c"
 
         "camera_ov2640.c"
+        "camera_http_server.c"
         "face_auth_adapter.c"
         "tflm_face_recognition.cpp"
         "face_model_data.cc"
@@ -37,4 +38,9 @@ idf_component_register(
         esp32-camera
         esp-tflite-micro
         driver
+        esp_http_server
+        esp_driver_gpio
+        esp_driver_i2c
+        esp_driver_spi
+        esp_driver_uart
 )

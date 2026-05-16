@@ -28,9 +28,7 @@ static int64_t now_ms(void)
 /*
  *  认证成功统一处理
  */
-static void auth_success(const char *user_id,
-                         const char *method,
-                         bool alarm_event)
+static void auth_success(const char *user_id,const char *method,bool alarm_event)
 {
     s_fail_count = 0;
 
@@ -45,9 +43,10 @@ static void auth_success(const char *user_id,
     }
 
     /*
-     * 胁迫密码要求静默报警，因此本地提示不要太异常。
+     * 胁迫密码要求静默报警，因此本地提示不要太异常,正常响铃两次。
      */
-    buzzer_beep(1, 80);
+    buzzer_beep(1,100);
+    
 
     lock_ctrl_open();
 }
@@ -62,16 +61,13 @@ static void auth_fail(const char *method)
 
     power_manager_feed_activity();
 
-    ESP_LOGW(TAG,
-             "Auth failed, method=%s, fail_count=%d",
-             method ? method : "unknown",
-             s_fail_count);
+    ESP_LOGW(TAG,"Auth failed, method=%s, fail_count=%d",method ? method : "unknown",s_fail_count);
 
     ui_show("AUTH FAILED", "TRY AGAIN");
 
     record_event("auth_fail", "unknown", method ? method : "unknown", false);
 
-    buzzer_beep(2, 80);
+    buzzer_beep(2,100);
 
     if (s_fail_count >= MAX_FAIL_COUNT) {
         s_lockout_until_ms = now_ms() + LOCKOUT_TIME_MS;
@@ -98,7 +94,7 @@ esp_err_t auth_init(void)
     return ESP_OK;
 }
 
-
+//判断是否道解锁时间
 bool auth_system_is_locked(void)
 {
     return now_ms() < s_lockout_until_ms;
@@ -126,7 +122,7 @@ void auth_submit_password(const char *password)
         auth_success("local_user", "password", true);
         return;
     }
-
+    //常规用户
     const user_record_t *user = user_db_find_by_password(password);
     if (user != NULL) {
         auth_success(user->user_id, "password", false);
@@ -174,10 +170,7 @@ void auth_submit_card(const uint8_t *uid, uint8_t uid_len)
  */
 void auth_submit_fingerprint(uint16_t finger_id, uint16_t confidence)
 {
-    ESP_LOGI(TAG,
-             "Fingerprint detected, id=%u, confidence=%u",
-             finger_id,
-             confidence);
+    ESP_LOGI(TAG,"Fingerprint detected, id=%u, confidence=%u",finger_id,confidence);
 
     if (auth_system_is_locked()) {
         ui_show("SYSTEM LOCKED", "PLEASE WAIT");
@@ -202,10 +195,7 @@ void auth_submit_fingerprint(uint16_t finger_id, uint16_t confidence)
  */
 void auth_submit_face_id(uint16_t face_id, int similarity)
 {
-    ESP_LOGI(TAG,
-             "Face recognized, face_id=%u, similarity=%d",
-             face_id,
-             similarity);
+    ESP_LOGI(TAG,"Face recognized, face_id=%u, similarity=%d",face_id,similarity);
 
     if (auth_system_is_locked()) {
         ui_show("SYSTEM LOCKED", "PLEASE WAIT");

@@ -17,9 +17,9 @@
  */
 #define USE_SERVO_LOCK              1
 
-#define NORMAL_PASSWORD             "123456"
-#define DURESS_PASSWORD             "654321"
-#define ADMIN_PASSWORD              "888888"
+#define NORMAL_PASSWORD             "123456"//正常密码
+#define DURESS_PASSWORD             "654321"//胁迫密码
+#define ADMIN_PASSWORD              "888888"//管理员密码
 
 #define PASSWORD_MAX_LEN            16
 #define MAX_FAIL_COUNT              5
@@ -41,16 +41,14 @@
  *  三、MQTT 云平台配置
  *
  * 局域网测试：
- *      mqtt://10.38.66.114:1883
+ *      mqtt://10.161.234.114:1883
  *
  * 云服务器测试：
  *      mqtt://你的云服务器IP:1883
  *
- * 如果 MQTT Broker 没有开启用户名密码认证，
- * MQTT_USERNAME 和 MQTT_PASSWORD 可以留空。
  */
 
-#define MQTT_BROKER_URI             "mqtt://10.38.66.114:1883"
+#define MQTT_BROKER_URI             "mqtt://10.161.234.114:1883"
 #define MQTT_USERNAME               "door_user"
 #define MQTT_PASSWORD               "door_pass"
 
@@ -148,7 +146,7 @@
 #define PCF8574_COL_2_BIT           6
 #define PCF8574_COL_3_BIT           7
 
-#define PCF8574_INT_GPIO            GPIO_NUM_4
+#define PCF8574_INT_GPIO            GPIO_NUM_19
 #define POWER_WAKE_GPIO             PCF8574_INT_GPIO
 
 
@@ -163,11 +161,11 @@
  *  九、MFRC522 RFID 模块 GPIO
  */
 
-#define RFID_SCK_GPIO               GPIO_NUM_12
-#define RFID_MOSI_GPIO              GPIO_NUM_11
-#define RFID_MISO_GPIO              GPIO_NUM_13
-#define RFID_CS_GPIO                GPIO_NUM_10
-#define RFID_RST_GPIO               GPIO_NUM_14
+#define RFID_SCK_GPIO               GPIO_NUM_36
+#define RFID_MOSI_GPIO              GPIO_NUM_37
+#define RFID_MISO_GPIO              GPIO_NUM_38
+#define RFID_CS_GPIO                GPIO_NUM_35//SDA
+#define RFID_RST_GPIO               GPIO_NUM_39
 
 #define RFID_SPI_CLOCK_HZ           1000000
 #define RFID_POLL_INTERVAL_MS       300
@@ -178,8 +176,8 @@
  */
 
 #define FINGER_UART_PORT            UART_NUM_1
-#define FINGER_TX_GPIO              GPIO_NUM_17
-#define FINGER_RX_GPIO              GPIO_NUM_18
+#define FINGER_TX_GPIO              GPIO_NUM_1//接模块RX
+#define FINGER_RX_GPIO              GPIO_NUM_2//接模块TX
 #define FINGER_BAUD_RATE            57600
 #define FINGER_UART_BUF_SIZE        256
 #define FINGER_PASSWORD             0x00000000
@@ -190,10 +188,10 @@
  *  十一、门锁、蜂鸣器、防拆 GPIO
  */
 
-#define SERVO_GPIO                  GPIO_NUM_15
+#define SERVO_GPIO                  GPIO_NUM_40
 //#define RELAY_GPIO                  GPIO_NUM_7//继电器
-#define BUZZER_GPIO                 GPIO_NUM_5
-#define TAMPER_GPIO                 GPIO_NUM_6
+#define BUZZER_GPIO                 GPIO_NUM_41
+#define TAMPER_GPIO                 GPIO_NUM_35
 
 
 /*
@@ -219,35 +217,35 @@
  *
  * 注意：
  *      OLED + PCF8574T 使用 I2C0：GPIO8 / GPIO9
- *      摄像头 SCCB 单独使用 I2C1：GPIO3 / GPIO38
+ *      摄像头 SCCB 单独使用 I2C1：GPIO17 / GPIO18加外接电阻3.3V上拉
  */
 
 #define CAMERA_SCCB_I2C_PORT_NUM    I2C_NUM_1
 
-#define CAMERA_XCLK_GPIO            GPIO_NUM_16
+#define CAMERA_XCLK_GPIO            GPIO_NUM_NC
 
-#define CAMERA_SIOD_GPIO            GPIO_NUM_3
-#define CAMERA_SIOC_GPIO            GPIO_NUM_38
+#define CAMERA_SIOD_GPIO            GPIO_NUM_17
+#define CAMERA_SIOC_GPIO            GPIO_NUM_18
 
-#define CAMERA_D0_GPIO              GPIO_NUM_1
-#define CAMERA_D1_GPIO              GPIO_NUM_2
-#define CAMERA_D2_GPIO              GPIO_NUM_35
-#define CAMERA_D3_GPIO              GPIO_NUM_36
-#define CAMERA_D4_GPIO              GPIO_NUM_37
-#define CAMERA_D5_GPIO              GPIO_NUM_39
-#define CAMERA_D6_GPIO              GPIO_NUM_40
-#define CAMERA_D7_GPIO              GPIO_NUM_41
+#define CAMERA_D0_GPIO              GPIO_NUM_4
+#define CAMERA_D1_GPIO              GPIO_NUM_16
+#define CAMERA_D2_GPIO              GPIO_NUM_5
+#define CAMERA_D3_GPIO              GPIO_NUM_11
+#define CAMERA_D4_GPIO              GPIO_NUM_6
+#define CAMERA_D5_GPIO              GPIO_NUM_12
+#define CAMERA_D6_GPIO              GPIO_NUM_7
+#define CAMERA_D7_GPIO              GPIO_NUM_13
 
-#define CAMERA_VSYNC_GPIO           GPIO_NUM_42
-#define CAMERA_HREF_GPIO            GPIO_NUM_47
-#define CAMERA_PCLK_GPIO            GPIO_NUM_19
+#define CAMERA_VSYNC_GPIO           GPIO_NUM_10
+#define CAMERA_HREF_GPIO            GPIO_NUM_14
+#define CAMERA_PCLK_GPIO            GPIO_NUM_15
 
 /*
- * 如果 PWDN 直接接 GND，RST 直接接 7，
+ * 如果 PWDN 直接接 GND，RST 直接接 3.3V，
  * 这里就配置为 GPIO_NUM_NC。
  */
 #define CAMERA_PWDN_GPIO            GPIO_NUM_NC
-#define CAMERA_RESET_GPIO           GPIO_NUM_7
+#define CAMERA_RESET_GPIO           GPIO_NUM_NC
 
 /*
  * 独立模块杜邦线连接时，建议先用 10MHz 测试。

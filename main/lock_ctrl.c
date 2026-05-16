@@ -25,8 +25,7 @@ static uint32_t servo_angle_to_duty(int angle)
         angle = 180;
     }
 
-    int pulse_us = SERVO_MIN_US +
-                   (SERVO_MAX_US - SERVO_MIN_US) * angle / 180;
+    int pulse_us = SERVO_MIN_US +(SERVO_MAX_US - SERVO_MIN_US) * angle / 180;
 
     /*
      * 50Hz PWM 周期为 20ms。

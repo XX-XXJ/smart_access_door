@@ -40,24 +40,7 @@ esp_err_t camera_ov2640_init(void)
     vTaskDelay(pdMS_TO_TICKS(150));
     #endif
 
-    /*
-    * 如果 PWDN 使用 GPIO 控制，则确保摄像头不处于掉电状态。
-    * 当前你如果把 PWDN 直接接 GND，这里不会执行。
-    */
-    #if CAMERA_PWDN_GPIO != GPIO_NUM_NC
-    gpio_config_t pwdn_conf = {
-        .pin_bit_mask = 1ULL << CAMERA_PWDN_GPIO,
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
 
-    gpio_config(&pwdn_conf);
-
-    gpio_set_level(CAMERA_PWDN_GPIO, 0);
-    vTaskDelay(pdMS_TO_TICKS(50));
-    #endif
     camera_config_t config = {
         .ledc_channel = LEDC_CHANNEL_1,
         .ledc_timer = LEDC_TIMER_1,
@@ -88,10 +71,10 @@ esp_err_t camera_ov2640_init(void)
          * 人脸识别阶段推荐灰度 + 低分辨率。
          */
         .pixel_format = PIXFORMAT_GRAYSCALE,
-        .frame_size = FRAMESIZE_QQVGA,
+        .frame_size = FRAMESIZE_QVGA,
 
-        .jpeg_quality = 12,
-        .fb_count = 1,
+        .jpeg_quality = 20,
+        .fb_count = 2,
         .fb_location = CAMERA_FB_IN_PSRAM,
         .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 
@@ -116,8 +99,8 @@ esp_err_t camera_ov2640_init(void)
 
     sensor_t *sensor = esp_camera_sensor_get();
     if (sensor != NULL) {
-        sensor->set_vflip(sensor, 0);
-        sensor->set_hmirror(sensor, 0);
+        sensor->set_vflip(sensor, 1);/* 修正上下颠倒 改1*/
+        sensor->set_hmirror(sensor, 0);/* 若左右反了，改为 1 */
         sensor->set_brightness(sensor, 0);
         sensor->set_contrast(sensor, 0);
         sensor->set_saturation(sensor, 0);
@@ -155,3 +138,5 @@ esp_err_t camera_ov2640_capture_test(void)
 
     return ESP_OK;
 }
+
+bool camera_ov2640_is_ready(void) { return s_camera_ready; }

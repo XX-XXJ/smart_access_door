@@ -24,6 +24,7 @@
 #include "fingerprint_as608.h"
 
 #include "camera_ov2640.h"
+#include "camera_http_server.h"
 #include "face_auth_adapter.h"
 #include "tflm_face_recognition.h"
 
@@ -469,23 +470,23 @@ void app_main(void)
          (unsigned int)uxTaskGetStackHighWaterMark(NULL));//确认栈残量
 
         //初始化摄像头
-    // esp_err_t camera_ret = camera_ov2640_init();
-    // if (camera_ret != ESP_OK) {
-    //     ESP_LOGE(TAG, "Camera init failed: %s", esp_err_to_name(camera_ret));
-    //     ui_show("CAMERA FAIL", "CHECK WIRE");
-    // } else {
-    //     ESP_LOGI(TAG, "Camera init OK");
-    //     camera_ov2640_capture_test();
-    // }
+    esp_err_t camera_ret = camera_ov2640_init();
+    if (camera_ret != ESP_OK) {
+        ESP_LOGE(TAG, "Camera init failed: %s", esp_err_to_name(camera_ret));
+        ui_show("CAMERA FAIL", "FACE OFF");
+    } else {
+        ESP_LOGI(TAG, "Camera init OK");
+        ui_show("CAMERA OK", "CAPTURE");
+        camera_ov2640_capture_test();
+    }
     // 临时禁用相机调试
-    esp_err_t camera_ret = ESP_FAIL;
+    // esp_err_t camera_ret = ESP_FAIL;
 
     /*
      * 初始化门禁基础模块。
      */
     ESP_ERROR_CHECK(alarm_init());
     ESP_ERROR_CHECK(lock_ctrl_init());
-    // ESP_ERROR_CHECK(keypad_init());
     esp_err_t keypad_ret = keypad_init();
     if (keypad_ret != ESP_OK) {
         ESP_LOGE(TAG,
@@ -499,7 +500,7 @@ void app_main(void)
 //建议以上改成更稳的写法，不要因为外设没接好就整机重启：
 
     ESP_ERROR_CHECK(auth_init());
-    // 暂停摄像头测试
+    // 暂停人脸测试
     // ESP_ERROR_CHECK(face_auth_adapter_init());
 
     /*
@@ -523,15 +524,15 @@ void app_main(void)
     /*
      * 初始化 TFLM 人脸识别模块。
      */
-    esp_err_t face_ret = ESP_FAIL;
+    // esp_err_t face_ret = ESP_FAIL;
 
-    if (camera_ret == ESP_OK) {
-        face_ret = tflm_face_recognition_init();
+    // if (camera_ret == ESP_OK) {
+    //     face_ret = tflm_face_recognition_init();
 
-        if (face_ret != ESP_OK) {
-            ESP_LOGW(TAG, "TFLM face init failed");
-        }
-    }
+    //     if (face_ret != ESP_OK) {
+    //         ESP_LOGW(TAG, "TFLM face init failed");
+    //     }
+    // }
 
     /*
      * 初始化功耗管理。
@@ -565,14 +566,14 @@ void app_main(void)
     /*
      * 启动 TFLM 人脸识别任务。
      */
-    if (face_ret == ESP_OK) {
-        esp_err_t ret = tflm_face_recognition_start();
+    // if (face_ret == ESP_OK) {
+    //     esp_err_t ret = tflm_face_recognition_start();
 
-        if (ret != ESP_OK) {
-            ESP_LOGW(TAG, "TFLM face start failed: %s",
-                     esp_err_to_name(ret));
-        }
-    }
+    //     if (ret != ESP_OK) {
+    //         ESP_LOGW(TAG, "TFLM face start failed: %s",
+    //                  esp_err_to_name(ret));
+    //     }
+    // }
 
     /*
      * 记录设备启动事件。
