@@ -418,7 +418,20 @@ void app_main(void)
 
     ui_show("WIFI", "CONNECTING");
 
-
+        //初始化摄像头
+    esp_err_t camera_ret = camera_ov2640_init();
+    if (camera_ret != ESP_OK) {
+        ESP_LOGE(TAG, "Camera init failed: %s", esp_err_to_name(camera_ret));
+        ui_show("CAMERA FAIL", "FACE OFF");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    } else {
+        ESP_LOGI(TAG, "Camera init OK");
+        ui_show("CAMERA OK", "CAPTURE");
+        camera_ov2640_capture_test();
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    // 临时禁用相机调试
+    // esp_err_t camera_ret = ESP_FAIL;
 
     /*
      * 初始化 Wi-Fi。
@@ -443,7 +456,16 @@ void app_main(void)
         ESP_LOGW(TAG, "Wi-Fi unavailable, local mode");
         ui_show("WIFI FAIL", "LOCAL MODE");
     }
-
+    //摄像头网页
+    if (camera_ov2640_is_ready()) {
+        camera_http_server_start();
+        ui_show("CAMERA WEB OK", "OPEN IP");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    else {
+        ui_show("CAMERA WEB FALL","IP FALL");
+    }
+    
     /*
      * 初始化 MQTT。
      * 即使 Wi-Fi 当前失败，也可以先初始化 MQTT 客户端。
@@ -469,18 +491,7 @@ void app_main(void)
     ESP_LOGI(TAG, "After event_log_init, stack=%u",
          (unsigned int)uxTaskGetStackHighWaterMark(NULL));//确认栈残量
 
-        //初始化摄像头
-    esp_err_t camera_ret = camera_ov2640_init();
-    if (camera_ret != ESP_OK) {
-        ESP_LOGE(TAG, "Camera init failed: %s", esp_err_to_name(camera_ret));
-        ui_show("CAMERA FAIL", "FACE OFF");
-    } else {
-        ESP_LOGI(TAG, "Camera init OK");
-        ui_show("CAMERA OK", "CAPTURE");
-        camera_ov2640_capture_test();
-    }
-    // 临时禁用相机调试
-    // esp_err_t camera_ret = ESP_FAIL;
+
 
     /*
      * 初始化门禁基础模块。

@@ -13,15 +13,36 @@ static const char *TAG = "CAMERA";
 
 static bool s_camera_ready = false;
 
-
-esp_err_t camera_ov2640_init(void)
+static void camera_sccb_bus_recover(void)
 {
+    gpio_config_t io = {
+        .pin_bit_mask = (1ULL << CAMERA_SIOD_GPIO) | (1ULL << CAMERA_SIOC_GPIO),
+        .mode = GPIO_MODE_OUTPUT_OD,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&io);
+    gpio_set_level(CAMERA_SIOD_GPIO, 1);
+    gpio_set_level(CAMERA_SIOC_GPIO, 1);
+    vTaskDelay(pdMS_TO_TICKS(10));
+
+    for (int i = 0; i < 9; i++) {
+        gpio_set_level(CAMERA_SIOC_GPIO, 0); esp_rom_delay_us(20);
+        gpio_set_level(CAMERA_SIOC_GPIO, 1); esp_rom_delay_us(20);
+    }
+    gpio_set_level(CAMERA_SIOD_GPIO, 0); esp_rom_delay_us(20);
+    gpio_set_level(CAMERA_SIOC_GPIO, 1); esp_rom_delay_us(20);
+    gpio_set_level(CAMERA_SIOD_GPIO, 1); esp_rom_delay_us(20);
+}
+
     /*
     * 摄像头硬复位。
     *
     * 如果 RST 接到了 CAMERA_RESET_GPIO，
     * 这里先主动拉低再拉高，确保 OV2640 从确定状态启动。
     */
+static void camera_ov2640_hard_reset(void){
     #if CAMERA_RESET_GPIO != GPIO_NUM_NC
     gpio_config_t rst_conf = {
         .pin_bit_mask = 1ULL << CAMERA_RESET_GPIO,
@@ -39,7 +60,19 @@ esp_err_t camera_ov2640_init(void)
     gpio_set_level(CAMERA_RESET_GPIO, 1);
     vTaskDelay(pdMS_TO_TICKS(150));
     #endif
+}
 
+
+esp_err_t camera_ov2640_init(void)
+{
+
+    /* 内部上拉只是辅助；硬件上仍需给 GPIO18/GPIO19 外接 4.7kΩ 上拉。 */
+    gpio_set_pull_mode(CAMERA_SIOD_GPIO, GPIO_PULLUP_ONLY);
+    gpio_set_pull_mode(CAMERA_SIOC_GPIO, GPIO_PULLUP_ONLY);
+    camera_sccb_bus_recover();
+    camera_ov2640_hard_reset();
+    camera_sccb_bus_recover();
+    vTaskDelay(pdMS_TO_TICKS(200));
 
     camera_config_t config = {
         .ledc_channel = LEDC_CHANNEL_1,
@@ -120,13 +153,21 @@ esp_err_t camera_ov2640_capture_test(void)
         return ESP_ERR_INVALID_STATE;
     }
 
+    for (int i = 0; i < 2; i++) {
+        camera_fb_t *drop = esp_camera_fb_get();
+        if (drop) esp_camera_fb_return(drop);
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
     camera_fb_t *fb = esp_camera_fb_get();
 
     if (fb == NULL) {
         ESP_LOGE(TAG, "Camera frame get failed");
         return ESP_FAIL;
     }
-
+    if (fb->format == PIXFORMAT_JPEG && fb->len >= 2) {
+        if (fb->buf[fb->len-2] == 0xFF && fb->buf[fb->len-1] == 0xD9) ESP_LOGI(TAG, "JPEG EOI OK");
+        else ESP_LOGW(TAG, "JPEG EOI missing");
+    }
     ESP_LOGI(TAG,
              "Capture OK: len=%u, width=%u, height=%u, format=%d",
              (unsigned int)fb->len,

@@ -161,11 +161,11 @@
  *  九、MFRC522 RFID 模块 GPIO
  */
 
-#define RFID_SCK_GPIO               GPIO_NUM_36
-#define RFID_MOSI_GPIO              GPIO_NUM_37
-#define RFID_MISO_GPIO              GPIO_NUM_38
-#define RFID_CS_GPIO                GPIO_NUM_35//SDA
-#define RFID_RST_GPIO               GPIO_NUM_39
+#define RFID_SCK_GPIO               GPIO_NUM_21
+#define RFID_MOSI_GPIO              GPIO_NUM_38
+#define RFID_MISO_GPIO              GPIO_NUM_39
+#define RFID_CS_GPIO                GPIO_NUM_42//SDA
+#define RFID_RST_GPIO               GPIO_NUM_47
 
 #define RFID_SPI_CLOCK_HZ           1000000
 #define RFID_POLL_INTERVAL_MS       300
@@ -191,7 +191,7 @@
 #define SERVO_GPIO                  GPIO_NUM_40
 //#define RELAY_GPIO                  GPIO_NUM_7//继电器
 #define BUZZER_GPIO                 GPIO_NUM_41
-#define TAMPER_GPIO                 GPIO_NUM_35
+#define TAMPER_GPIO                 GPIO_NUM_20
 
 
 /*
@@ -251,7 +251,7 @@
  * 独立模块杜邦线连接时，建议先用 10MHz 测试。
  * 稳定后再考虑 20MHz。
  */
-#define CAMERA_XCLK_FREQ_HZ         10000000
+#define CAMERA_XCLK_FREQ_HZ         20000000
 
 /*
  *  十四、TFLM 人脸识别配置
