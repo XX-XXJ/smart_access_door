@@ -20,21 +20,6 @@ static const char *TAG1= "BUZZER";
 /*
  *  蜂鸣器
  */
-esp_err_t buzzer_init(void)
-{
-    gpio_config_t cfg = {
-        .pin_bit_mask = 1ULL << BUZZER_GPIO,
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-    esp_err_t ret = gpio_config(&cfg);
-    if (ret != ESP_OK) return ret;
-    gpio_set_level(BUZZER_GPIO, 0);
-    ESP_LOGI(TAG0, "Buzzer initialized, gpio=%d", BUZZER_GPIO);
-    return ESP_OK;
-}
 
 //发声
 void buzzer_beep(int times,int duration_ms)
@@ -50,7 +35,7 @@ void buzzer_beep(int times,int duration_ms)
 //被拆长鸣
 void buzzer_beep_temper(void)
 {
-    gpio_set_level(BUZZER_GPIO, 1);
+    gpio_set_level(BUZZER_GPIO, 0);
 }
 
 /*
@@ -109,9 +94,13 @@ esp_err_t alarm_init(void)
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
-
-    ESP_ERROR_CHECK(gpio_config(&buzzer_conf));
+    esp_err_t ret = gpio_config(&buzzer_conf);
+    if (ret != ESP_OK) return ret;
     gpio_set_level(BUZZER_GPIO, 0);
+    ESP_LOGI(TAG0, "Buzzer initialized, gpio=%d", BUZZER_GPIO);
+    return ESP_OK;
+
+
 
     //暂时搁置
     // gpio_config_t tamper_conf = {

@@ -146,7 +146,7 @@
 #define PCF8574_COL_2_BIT           6
 #define PCF8574_COL_3_BIT           7
 
-#define PCF8574_INT_GPIO            GPIO_NUM_19
+#define PCF8574_INT_GPIO            GPIO_NUM_48
 #define POWER_WAKE_GPIO             PCF8574_INT_GPIO
 
 
@@ -251,7 +251,7 @@
  * 独立模块杜邦线连接时，建议先用 10MHz 测试。
  * 稳定后再考虑 20MHz。
  */
-#define CAMERA_XCLK_FREQ_HZ         20000000
+#define CAMERA_XCLK_FREQ_HZ         24000000
 
 /*
  *  十四、TFLM 人脸识别配置

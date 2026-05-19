@@ -419,6 +419,7 @@ void app_main(void)
     ui_show("WIFI", "CONNECTING");
 
         //初始化摄像头
+    vTaskDelay(pdMS_TO_TICKS(1000));
     esp_err_t camera_ret = camera_ov2640_init();
     if (camera_ret != ESP_OK) {
         ESP_LOGE(TAG, "Camera init failed: %s", esp_err_to_name(camera_ret));
@@ -427,6 +428,7 @@ void app_main(void)
     } else {
         ESP_LOGI(TAG, "Camera init OK");
         ui_show("CAMERA OK", "CAPTURE");
+        //
         camera_ov2640_capture_test();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -465,7 +467,7 @@ void app_main(void)
     else {
         ui_show("CAMERA WEB FALL","IP FALL");
     }
-    
+
     /*
      * 初始化 MQTT。
      * 即使 Wi-Fi 当前失败，也可以先初始化 MQTT 客户端。

@@ -103,10 +103,10 @@ esp_err_t camera_ov2640_init(void)
         /*
          * 人脸识别阶段推荐灰度 + 低分辨率。
          */
-        .pixel_format = PIXFORMAT_GRAYSCALE,
+        .pixel_format = PIXFORMAT_JPEG,//PIXFORMAT_GRAYSCALE
         .frame_size = FRAMESIZE_QVGA,
 
-        .jpeg_quality = 20,
+        .jpeg_quality = 12,
         .fb_count = 2,
         .fb_location = CAMERA_FB_IN_PSRAM,
         .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
